@@ -1,33 +1,31 @@
 package tui
 
 import (
+	"context"
+	"time"
+
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/koha90/tui_bots_manager/internal/bot"
 )
 
-func loadBotsCmd(mgr *bot.Manager) func() tea.Msg {
+func StartBotCmd(b bot.Bot) tea.Cmd {
 	return func() tea.Msg {
-		bots := mgr.List()
-
-		result := make([]BotView, 0, len(bots))
-		for _, b := range bots {
-			result = append(result, BotView{
-				ID:     b.ID,
-				Status: mapStatus(b.Status),
-			})
-		}
-
-		return BotsLoadedMsg{Bots: result}
+		_ = b.Start(context.Background())
+		return BotStateChangeMsg{}
 	}
 }
 
-func mapStatus(s bot.Status) BotStatus {
-	switch s {
-	case bot.Running:
-		return Running
-	case bot.Error:
-		return Error
-	default:
-		return Stopped
+func StopBotCmd(b bot.Bot) tea.Cmd {
+	return func() tea.Msg {
+		_ = b.Stop()
+		return BotStateChangeMsg{}
 	}
+}
+
+type TickMsg struct{}
+
+func TickCmd() tea.Cmd {
+	return tea.Tick(time.Millisecond*200, func(time.Time) tea.Msg {
+		return TickMsg{}
+	})
 }

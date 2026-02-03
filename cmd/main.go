@@ -10,6 +10,11 @@ import (
 
 func main() {
 	mgr := bot.NewManager()
+
+	mgr.Add(bot.NewFake("alpha"))
+	mgr.Add(bot.NewFake("beta"))
+	mgr.Add(bot.NewFake("gamma"))
+
 	p := tea.NewProgram(
 		tui.New(mgr),
 		tea.WithAltScreen(),

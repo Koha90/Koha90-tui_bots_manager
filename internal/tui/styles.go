@@ -13,6 +13,8 @@ var (
 	graySoft = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#AAB7B8"))
 
+	yellowSoft = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#F7DC49"))
 	cursorStyle = lipgloss.NewStyle().
 			Foreground(lipgloss.Color("#F7DC6F"))
 )

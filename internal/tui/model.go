@@ -8,21 +8,8 @@ import (
 	"github.com/koha90/tui_bots_manager/internal/bot"
 )
 
-type BotStatus int
-
-const (
-	Stopped BotStatus = iota
-	Running
-	Error
-)
-
-type BotView struct {
-	ID     string
-	Status BotStatus
-}
-
 type Model struct {
-	Bots    []BotView
+	Bots    []bot.Bot
 	Cursor  int
 	Manager *bot.Manager
 }
@@ -34,58 +21,45 @@ func New(mgr *bot.Manager) Model {
 }
 
 func (m Model) Init() tea.Cmd {
-	return loadBotsCmd(m.Manager)
+	return tea.Batch(
+		TickCmd(),
+		func() tea.Msg {
+			return BotsLoadedMsg{
+				Bots: m.Manager.List(),
+			}
+		},
+	)
 }
 
 // Update - обработка и привязка клавиш.
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
-
 	case tea.KeyMsg:
 		switch msg.String() {
-		case "ctrl+c", "q":
+		case "ctrl+c", "q", "й":
 			return m, tea.Quit
-		case "up", "k":
+		case "up", "k", "л":
 			if m.Cursor > 0 {
 				m.Cursor--
 			}
-		case "down", "j":
+		case "down", "j", "о":
 			if m.Cursor < len(m.Bots)-1 {
 				m.Cursor++
 			}
-		case "s":
-			if len(m.Bots) > 0 {
-				bot := m.Bots[m.Cursor]
-				return m, func() tea.Msg {
-					return StartBotMsg{ID: bot.ID}
-				}
-			}
-		case "x":
-			if len(m.Bots) > 0 {
-				bot := m.Bots[m.Cursor]
-				return m, func() tea.Msg {
-					return StartBotMsg{ID: bot.ID}
-				}
-			}
+		case "s", "ы":
+			bot := m.Bots[m.Cursor]
+			return m, StartBotCmd(bot)
+		case "x", "ч":
+			bot := m.Bots[m.Cursor]
+			return m, StopBotCmd(bot)
 		}
 
 	case BotsLoadedMsg:
 		m.Bots = msg.Bots
 		m.Cursor = 0
 
-	case StartBotMsg:
-		for i := range m.Bots {
-			if m.Bots[i].ID == msg.ID {
-				m.Bots[i].Status = Running
-			}
-		}
-
-	case StopBotMsg:
-		for i := range m.Bots {
-			if m.Bots[i].ID == msg.ID {
-				m.Bots[i].Status = Stopped
-			}
-		}
+	case TickMsg:
+		return m, TickCmd()
 	}
 
 	return m, nil
@@ -95,31 +69,30 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (m Model) View() string {
 	s := "👾 Bots:\n\n"
 
-	for i, bot := range m.Bots {
+	for i, b := range m.Bots {
 		cursor := " "
 		if m.Cursor == i {
 			cursor = cursorStyle.Render("")
 		}
 
-		status := ""
+		status := b.Status()
 		style := graySoft
 
-		switch bot.Status {
-		case Running:
-			status = "● running"
+		switch status {
+		case bot.Running:
 			style = greenSoft
-		case Stopped:
-			status = "○ stopped"
+		case bot.Starting:
+			style = yellowSoft
+		case bot.Stopped:
 			style = graySoft
-		case Error:
-			status = "✖ error"
+		case bot.Error:
 			style = redSoft
 		}
 
 		s += fmt.Sprintf(
 			"%s %-20s %s\n",
-			cursor, bot.ID,
-			style.Render(status),
+			cursor, b.ID(),
+			style.Render(status.String()),
 		)
 	}
 
