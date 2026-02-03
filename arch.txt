@@ -1,0 +1,34 @@
+botctl/
+├── cmd/
+│   └── botctl/
+│       └── main.go            # запуск TUI / headless
+│
+├── internal/
+│   ├── app/                   # сборка приложения
+│   │   └── app.go             # wiring: config → manager → tui
+│   │
+│   ├── config/
+│   │   ├── config.go          # структуры
+│   │   └── loader.go          # загрузка yaml/env
+│   │
+│   ├── bot/
+│   │   ├── manager.go         # Start / Stop / Status
+│   │   ├── instance.go        # один бот (runtime)
+│   │   └── events.go          # BotStarted, BotStopped, BotError
+│   │
+│   ├── tui/
+│   │   ├── model.go           # tea.Model (Init, Update, View)
+│   │   ├── messages.go        # StartBotMsg, StopBotMsg
+│   │   ├── styles.go          # lipgloss цвета и стили
+│   │   ├── keys.go            # биндинги клавиш
+│   │   └── view.go            # отрисовка (если разрастётся)
+│   │
+│   └── storage/
+│       ├── storage.go         # интерфейс
+│       ├── sqlite/
+│       └── postgres/
+│
+├── configs/
+│   └── bots.yaml
+│
+└── go.mod
