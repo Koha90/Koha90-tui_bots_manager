@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/koha90/tui_bots_manager/internal/bot"
@@ -11,9 +12,18 @@ import (
 func main() {
 	mgr := bot.NewManager()
 
-	mgr.Add(bot.NewFake("alpha"))
-	mgr.Add(bot.NewFake("beta"))
-	mgr.Add(bot.NewFake("gamma"))
+	alpha := bot.NewFake("alpha")
+	beta := bot.NewFake("beta")
+	gamma := bot.NewFake("gamma")
+
+	mgr.Add(alpha)
+	mgr.Add(beta)
+	mgr.Add(gamma)
+
+	go func() {
+		time.Sleep(2 * time.Second)
+		beta.SimulateError()
+	}()
 
 	p := tea.NewProgram(
 		tui.New(mgr),

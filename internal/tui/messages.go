@@ -17,4 +17,9 @@ type (
 	}
 )
 
-type BotStateChangeMsg struct{}
+const (
+	ConfirmStopMsg = "⚠ press x again to stop"
+	ErrorBotMsg    = "❌ bot error, check logs"
+	AlreadyRunning = "▶️ bot already running"
+	AlreadyStopped = "⏹️bot already stopped"
+)

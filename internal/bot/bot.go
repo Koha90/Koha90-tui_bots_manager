@@ -11,6 +11,13 @@ const (
 	Error
 )
 
+var StatusNames = map[Status]string{
+	Stopped:  "stopped",
+	Starting: "starting",
+	Running:  "running",
+	Error:    "error",
+}
+
 type Bot interface {
 	ID() string
 	Start(ctx context.Context) error
@@ -19,16 +26,8 @@ type Bot interface {
 }
 
 func (s Status) String() string {
-	switch s {
-	case Running:
-		return "running"
-	case Starting:
-		return "starting"
-	case Stopped:
-		return "stopped"
-	case Error:
-		return "error"
-	default:
-		return "unknown"
+	if v, ok := StatusNames[s]; ok {
+		return v
 	}
+	return "unknown"
 }

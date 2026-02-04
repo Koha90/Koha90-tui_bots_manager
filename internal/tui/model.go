@@ -9,9 +9,10 @@ import (
 )
 
 type Model struct {
-	Bots    []bot.Bot
-	Cursor  int
-	Manager *bot.Manager
+	Bots        []bot.Bot
+	Cursor      int
+	Manager     *bot.Manager
+	ConfirmStop string
 }
 
 func New(mgr *bot.Manager) Model {
@@ -22,12 +23,10 @@ func New(mgr *bot.Manager) Model {
 
 func (m Model) Init() tea.Cmd {
 	return tea.Batch(
-		TickCmd(),
 		func() tea.Msg {
-			return BotsLoadedMsg{
-				Bots: m.Manager.List(),
-			}
+			return BotsLoadedMsg{Bots: m.Manager.List()}
 		},
+		ListenBotEvents(m.Manager),
 	)
 }
 
@@ -35,6 +34,7 @@ func (m Model) Init() tea.Cmd {
 func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	switch msg := msg.(type) {
 	case tea.KeyMsg:
+		b := m.Bots[m.Cursor]
 		switch msg.String() {
 		case "ctrl+c", "q", "й":
 			return m, tea.Quit
@@ -47,11 +47,19 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 				m.Cursor++
 			}
 		case "s", "ы":
-			bot := m.Bots[m.Cursor]
-			return m, StartBotCmd(bot)
+			if b.Status() == bot.Stopped {
+				return m, StartBotCmd(b, m.Manager)
+			}
 		case "x", "ч":
-			bot := m.Bots[m.Cursor]
-			return m, StopBotCmd(bot)
+			currentStatus := m.Manager.Status(b.ID())
+			if m.ConfirmStop != b.ID() {
+				m.ConfirmStop = b.ID()
+				return m, nil
+			}
+			m.ConfirmStop = ""
+			if currentStatus == bot.Running {
+				return m, StopBotCmd(b, m.Manager)
+			}
 		}
 
 	case BotsLoadedMsg:
@@ -60,6 +68,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case TickMsg:
 		return m, TickCmd()
+
+	case BotStateChangeMsg:
+		return m, ListenBotEvents(m.Manager)
 	}
 
 	return m, nil
@@ -89,13 +100,20 @@ func (m Model) View() string {
 			style = redSoft
 		}
 
-		s += fmt.Sprintf(
-			"%s %-20s %s\n",
-			cursor, b.ID(),
-			style.Render(status.String()),
-		)
+		s += fmt.Sprintf("%s %-20s %s\n", cursor, b.ID(), style.Render(status.String()))
 	}
 
+	// Предупреждение об остановке бота.
+	if m.ConfirmStop != "" && m.Manager.Status(m.ConfirmStop) == bot.Running {
+		s += redSoft.Render(ConfirmStopMsg)
+	}
+
+	// сообщение об ошибке, если есть
+	for _, b := range m.Bots {
+		if m.Manager.Status(b.ID()) == bot.Error {
+			s += "\n" + redSoft.Render(ErrorBotMsg)
+		}
+	}
 	s += "\n[s] start  [x] stop  [q] выход\n"
 	return s
 }

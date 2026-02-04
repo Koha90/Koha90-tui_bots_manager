@@ -9,7 +9,6 @@ import (
 type FakeBot struct {
 	id     string
 	status atomic.Int32
-
 	cancel context.CancelFunc
 }
 
@@ -55,4 +54,9 @@ func (b *FakeBot) Stop() error {
 		b.cancel = nil
 	}
 	return nil
+}
+
+// SimulateError - прямо вызывает статус Error
+func (b *FakeBot) SimulateError() {
+	b.status.Store(int32(Error))
 }
