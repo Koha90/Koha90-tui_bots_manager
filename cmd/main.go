@@ -4,6 +4,7 @@ import (
 	"log"
 
 	tea "github.com/charmbracelet/bubbletea"
+
 	"github.com/koha90/tui_bots_manager/internal/bot"
 	"github.com/koha90/tui_bots_manager/internal/tui"
 )
@@ -49,6 +50,46 @@ func main() {
 		bot.NewFake("alpha37"),
 		bot.NewFake("alpha38"),
 		bot.NewFake("alpha39"),
+		bot.NewFake("alpha40"),
+		bot.NewFake("alpha41"),
+		bot.NewFake("alpha42"),
+		bot.NewFake("alpha43"),
+		bot.NewFake("alpha44"),
+		bot.NewFake("alpha45"),
+		bot.NewFake("alpha46"),
+		bot.NewFake("alpha47"),
+		bot.NewFake("alpha48"),
+		bot.NewFake("alpha49"),
+		bot.NewFake("alpha50"),
+		bot.NewFake("alpha51"),
+		bot.NewFake("alpha52"),
+		bot.NewFake("alpha53"),
+		bot.NewFake("alpha54"),
+		bot.NewFake("alpha55"),
+		bot.NewFake("alpha56"),
+		bot.NewFake("alpha57"),
+		bot.NewFake("alpha58"),
+		bot.NewFake("alpha59"),
+		bot.NewFake("alpha60"),
+		bot.NewFake("alpha61"),
+		bot.NewFake("alpha62"),
+		bot.NewFake("alpha63"),
+		bot.NewFake("alpha64"),
+		bot.NewFake("alpha65"),
+		bot.NewFake("alpha66"),
+		bot.NewFake("alpha67"),
+		bot.NewFake("alpha68"),
+		bot.NewFake("alpha69"),
+		bot.NewFake("alpha70"),
+		bot.NewFake("alpha71"),
+		bot.NewFake("alpha72"),
+		bot.NewFake("alpha73"),
+		bot.NewFake("alpha74"),
+		bot.NewFake("alpha75"),
+		bot.NewFake("alpha76"),
+		bot.NewFake("alpha77"),
+		bot.NewFake("alpha78"),
+		bot.NewFake("alpha79"),
 	}
 
 	mgr := bot.NewManager()

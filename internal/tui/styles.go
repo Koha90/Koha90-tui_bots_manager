@@ -3,6 +3,7 @@ package tui
 
 import (
 	"github.com/charmbracelet/lipgloss"
+
 	"github.com/koha90/tui_bots_manager/internal/bot"
 )
 
@@ -22,7 +23,18 @@ var (
 			Foreground(lipgloss.Color("#F7DC6F"))
 )
 
-func statusStile(s bot.Status) lipgloss.Style {
+var (
+	headerStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#45ada8"))
+
+	infoStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#c7f464"))
+
+	footerStyle = lipgloss.NewStyle().
+			Foreground(lipgloss.Color("#45ada8"))
+)
+
+func statusStyle(s bot.Status) lipgloss.Style {
 	switch s {
 	case bot.Running:
 		return greenSoft
@@ -32,5 +44,16 @@ func statusStile(s bot.Status) lipgloss.Style {
 		return redSoft
 	default:
 		return graySoft
+	}
+}
+
+func botStyle(b bot.Bot) lipgloss.Style {
+	switch b.Status() {
+	case bot.Running:
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("10"))
+	case bot.Error:
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("9"))
+	default:
+		return lipgloss.NewStyle().Foreground(lipgloss.Color("8"))
 	}
 }
